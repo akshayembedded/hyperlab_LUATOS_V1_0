@@ -69,7 +69,9 @@ void ble_task(void *pvParameter) {
     // pinMode(LED_PIN, OUTPUT);
 
     while (1) {
+        
         processBLEMessages();
+        bleController.processOTAData();
         vTaskDelay(10); // FreeRTOS delay (1000ms)
     }
 }
@@ -117,7 +119,7 @@ initializeBLEController("HyperLab");
     xTaskCreatePinnedToCore(
         ble_task,    // Task function
         "ble_task",  // Task name
-        8192,          // Stack size
+        81920,          // Stack size
         NULL,          // Parameters
         1,             // Priority
         NULL,           // Task handle

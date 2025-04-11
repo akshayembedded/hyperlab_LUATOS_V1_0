@@ -214,13 +214,95 @@ void BLEController::sendmsgOTA(String str)
     for (int i = 0; i < str.length(); i += cunkmtu)
     {
         String chunk = str.substring(i, i + cunkmtu);
-        Serial.println("--" + chunk);
+        // LLOGI("--" + chunk);
         otaTX->setValue((uint8_t *)chunk.c_str(), chunk.length());
         otaTX->notify();
         delay(10);
     }
 }
 
+// perform the actual update from a given stream
+bool BLEController::performUpdate(Stream &updateSource, size_t updateSize)
+{
+    if (Update.begin(updateSize))
+    {
+        size_t written = Update.writeStream(updateSource);
+        if (written == updateSize)
+        {
+            Serial.println("Written : " + String(written) + " successfully");
+        }
+        else
+        {
+            Serial.println("Written only : " + String(written) + "/" + String(updateSize) + ". Retry?");
+            // return false;
+        }
+        if (Update.end())
+        {
+            Serial.println("OTA done!");
+            if (Update.isFinished())
+            {
+                Serial.println("Update successfully completed. Rebooting.");
+                return true;
+            }
+            else
+            {
+                Serial.println("Update not finished? Something went wrong!");
+                return false;
+            }
+        }
+        else
+        {
+            Serial.println("Error Occurred. Error #: " + String(Update.getError()));
+            return false;
+        }
+    }
+    else
+    {
+        Serial.println("Not enough space to begin OTA");
+        return false;
+    }
+}
+
+// check given FS for valid update.bin and perform update if available
+bool BLEController::updateFromFS(fs::FS &fs, const char *path)
+{
+    // add / to the start of the path
+    bool success = false;
+    File updateBin = fs.open(path);
+    if (updateBin)
+    {
+        // if(updateBin.isDirectory()){
+        //    Serial.printf("Error, %s is not a file\n", path);
+        //    updateBin.close();
+        //    return;
+        // }
+
+        size_t updateSize = updateBin.size();
+
+        Serial.printf("Update name: %s size: %d\n", path, updateSize);
+        if (updateSize > 0)
+        {
+            Serial.println("Try to start update");
+            success = performUpdate(updateBin, updateSize);
+        }
+        else
+        {
+            Serial.println("Error, file is empty");
+        }
+
+        updateBin.close();
+
+        // whe finished remove the binary from sd card to indicate end of the process
+        fs.remove(path);
+    }
+    else
+    {
+        Serial.println("Could not load update.bin from sd root");
+
+        return false;
+    }
+    return success;
+}
 
 
 // void BLEController::startAdvertising() {
@@ -244,7 +326,6 @@ void BLEController::startAdvertising()
 
     adData.setCompleteServices(NimBLEUUID(productUUID.c_str()));
     pAdvertising->setAdvertisementData(adData);
- \
     bool success = BLEDevice::startAdvertising();
 }
 
@@ -533,7 +614,7 @@ void BLEController::handleOTA(String data, uint8_t msgId)
 
     if (error)
     {
-        Serial.println("Failed to parse JSON");
+        LLOGI("Failed to parse JSON");
         sendResponseJsonOTA("JSON_ERROR", "jsonerror", msgId);
         return;
     }
@@ -575,7 +656,7 @@ void BLEController::handleOTA(String data, uint8_t msgId)
     }
     else if (strcmp(msgtype, "filelist") == 0)
     {
-        Serial.println("filelist");
+        LLOGI("filelist");
         JsonDocument responseDoc; // Increase the size as needed
         JsonArray fileListArray = responseDoc.createNestedArray("fileList");
         SpiffsFile::ErrorCode errorCode = SpiffsFile::listFiles(fileListArray);
