@@ -1,0 +1,20 @@
+[pkg]
+Repo = "../"
+Release = false
+SocSupport = true
+
+[esp32]
+Type = "uart"
+COM = "COM3"
+Baud = "115200"
+Luadb = true
+Firmware = "LuatOS-SoC_ESP32C3_19af05d_20220725204613.soc"
+FsPath = "../demo/wifi/station"
+
+[esp32s3]
+Type = "uart"
+COM = "COM4"
+Baud = "921600"
+Luadb = true
+Firmware = "LuatOS-SoC_V0003_ESP32S3.soc"
+FsPath = "../demo/uart"
