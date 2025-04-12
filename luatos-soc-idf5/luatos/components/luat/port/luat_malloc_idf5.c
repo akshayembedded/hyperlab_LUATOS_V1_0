@@ -145,7 +145,7 @@ void luat_meminfo_sys(size_t *total, size_t *used, size_t *max_used)
 
 void luat_heap_init(void)
 {
-#ifdef LUAT_USE_PSRAM
+#ifdef  tree`12
     size_t t = esp_psram_get_size();
     LLOGD("Found %d kbyte PSRAM", t / 1024);
     size_t psram_sz = 0;

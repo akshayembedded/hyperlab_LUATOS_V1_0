@@ -68,12 +68,15 @@ void hookfunc(lua_State *L, lua_Debug *ar);
 void ble_task(void *pvParameter) {
     
     // pinMode(LED_PIN, OUTPUT);
+    esp_task_wdt_add(NULL);
 
     while (1) {
         
         processBLEMessages();
         bleController.processOTAData();
+        esp_task_wdt_reset();
         vTaskDelay(10); // FreeRTOS delay (1000ms)
+     
     }
 }
 
@@ -120,11 +123,11 @@ initializeBLEController("HyperLab");
     xTaskCreatePinnedToCore(
         ble_task,    // Task function
         "ble_task",  // Task name
-        81920,          // Stack size
+        4096,          // Stack size
         NULL,          // Parameters
         1,             // Priority
         NULL,           // Task handle
-        1
+        0
     );
   
 }
@@ -135,7 +138,7 @@ void luaClose(String closeScript)
     isClosed = true;
     closeScript.replace('\x01', ' ');
     luaStopScript = closeScript;
-    esp_task_wdt_reset();
+    // esp_task_wdt_reset();
     // Serial.println("luaStopScript");
     // Serial.println(luaStopScript);
     // luaobj.stop();
@@ -144,9 +147,9 @@ void luaClose(String closeScript)
 
 void lua_loop(String script)
 {
-    char charArray[2000]={0};
-    esp_task_wdt_reset();
-    script.toCharArray(charArray, script.length());
+    
+    // esp_task_wdt_reset();
+    
 
 // Serial.println("lua_loop-----------------------------------------------------");
     // Serial.printf("Arduino Stack was set to %d bytes\n", getArduinoLoopTaskStackSize());
@@ -158,7 +161,16 @@ void lua_loop(String script)
 LLOGI("lua_loop-----------------------------------------------------");
         // Use a try-catch block to handle Lua errors
        
-            luaL_dostring(L,charArray);
+            luaL_dostring(L,script.c_str());
+            if (isClosed)
+    {
+        isClosed = false;
+
+        luaL_dostring(L,luaStopScript.c_str());
+        luaStopScript = "";
+        luaL_error(L, "lua script closed");
+        // lua_close(L);
+    }
            
 
         // luaobj.stop();

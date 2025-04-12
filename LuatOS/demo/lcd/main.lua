@@ -50,7 +50,7 @@ local rtos_bsp = rtos.bsp()
 -- spi_id,pin_reset,pin_dc,pin_cs,bl
 function lcd_pin()
 
-        return 2,10,6,7,11
+        return 4,10,6,7,11
     
 end
 

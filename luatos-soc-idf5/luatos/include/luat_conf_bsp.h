@@ -211,7 +211,7 @@
 //PSRAM
 //如果是ESP32S3, 则启用PSRAM
 #if defined(CONFIG_IDF_TARGET_ESP32S3)
-#define LUAT_USE_PSRAM 1
+// #define LUAT_USE_PSRAM 0
 #endif
 
 

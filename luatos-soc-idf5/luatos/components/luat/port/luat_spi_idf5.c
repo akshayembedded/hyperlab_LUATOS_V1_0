@@ -40,6 +40,11 @@ int luat_spi_setup(luat_spi_t *spi){
         buscfg.sclk_io_num = SPI3_SCLK_IO_NUM;
     }
 #endif
+else if(spi->id == 4){
+    buscfg.miso_io_num = -1;
+    buscfg.mosi_io_num = 3;
+    buscfg.sclk_io_num = 5;
+}
     else{
         return -1;
     }

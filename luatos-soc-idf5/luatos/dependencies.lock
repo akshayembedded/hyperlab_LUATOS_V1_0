@@ -114,7 +114,7 @@ dependencies:
       type: service
     version: 0.6.0~1
   espressif/esp-dsp:
-    component_hash: fa7fe74305df6da25867437ebcd4213e047cbfc0556cf92067ab657fce537c6e
+    component_hash: 3e7bbd487f1357a1d4944d0c85966d049501ea281b8a4c7f93f7cfedd5b7f23d
     dependencies:
     - name: idf
       require: private
@@ -122,7 +122,7 @@ dependencies:
     source:
       registry_url: https://components.espressif.com/
       type: service
-    version: 1.5.2
+    version: 1.4.12
   espressif/esp-modbus:
     component_hash: e42ebfdfc9d8e46821a915b4c1a5c6465c44dbd4e1bca10531e26f4adc7acc42
     dependencies:
@@ -140,6 +140,20 @@ dependencies:
       registry_url: https://components.espressif.com
       type: service
     version: 0.0.11
+  espressif/esp-sr:
+    component_hash: 9b41fd5ae5960c393bfd3559cd6e5fa2a95c0bf833915cebafe57fb8c4e4c396
+    dependencies:
+    - name: espressif/esp-dsp
+      registry_url: https://components.espressif.com
+      require: private
+      version: <=1.5.0
+    - name: idf
+      require: private
+      version: '>=5.0'
+    source:
+      registry_url: https://components.espressif.com/
+      type: service
+    version: 1.9.5
   espressif/esp-zboss-lib:
     component_hash: fad683f7e04366398b61c0eea6e6517d4fe7ec4112407e26743dc80bafc0dcdc
     dependencies:
@@ -223,7 +237,7 @@ dependencies:
       type: service
     version: 1.4.0
   espressif/esp_rainmaker:
-    component_hash: 1d3c39e55e58bbfb7797893b314d702a625b3ac471d25b6b5e33708fbf436f3d
+    component_hash: 3ce075b9f8bdf4e67e8734127bca20ec159effdc5a0f9c590cd2ee36d3a1f250
     dependencies:
     - name: espressif/esp_rcp_update
       registry_url: https://components.espressif.com
@@ -268,7 +282,7 @@ dependencies:
     source:
       registry_url: https://components.espressif.com/
       type: service
-    version: 1.5.3
+    version: 1.5.4
   espressif/esp_rcp_update:
     component_hash: c10afbd54a17f27eed880e61262b161656e6d36ad63376c307f9273e99d0abcd
     dependencies:
@@ -397,6 +411,7 @@ direct_dependencies:
 - espressif/arduino-esp32
 - espressif/esp-dsp
 - espressif/esp-modbus
+- espressif/esp-sr
 - espressif/esp-zboss-lib
 - espressif/esp-zigbee-lib
 - espressif/esp_insights
@@ -410,5 +425,5 @@ direct_dependencies:
 - idf
 - joltwallet/littlefs
 manifest_hash: cb4d09735eb2490c755081ba8d03820875af03d7c6d4ce543336abf5a338e019
-target: esp32
+target: esp32s3
 version: 2.0.0

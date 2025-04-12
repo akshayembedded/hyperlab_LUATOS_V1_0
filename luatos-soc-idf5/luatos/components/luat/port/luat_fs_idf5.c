@@ -76,6 +76,7 @@ const luat_romfs_ctx idf5_romfs2 = {
 
 
 int luat_fs_init(void) {
+    esp_vfs_spiffs_unregister(NULL);
 	esp_err_t ret = esp_vfs_spiffs_register(&spiffs_conf);
 	if (ret) {
 		LLOGW("spiffs register ret %d %s", ret, esp_err_to_name(ret));
