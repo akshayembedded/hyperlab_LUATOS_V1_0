@@ -1,5 +1,5 @@
 
-
+#include "Arduino.h"
 #include "luat_base.h"
 #include "luat_mem.h"
 #include "luat_fs.h"
@@ -7,6 +7,7 @@
 #include "luat_msgbus.h"
 #include "luat_timer.h"
 #include "luat_rtos.h"
+
 
 #include "luat_ota.h"
 
@@ -173,6 +174,7 @@ int luat_main_call(void) {
 //   L = lua_newstate(luat_profiler_alloc, NULL);
 // #else
   L = lua_newstate(luat_heap_alloc, NULL);
+  
 // #endif
   if (L == NULL) {
     l_message("lua", "cannot create state: not enough memory\n");

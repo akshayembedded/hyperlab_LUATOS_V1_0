@@ -5,6 +5,7 @@
 #include "ble_controller.h"
 #include "ble_handlers.h"
 #include "NimBLEDevice.h"
+
 void lua_loop(String script);
 String luaStopScript = "";
 bool isClosed = false;
@@ -62,7 +63,7 @@ void luat_mcu_us_timer_init();
 extern void luat_shell_poweron(int _drv);
 }
 #include "Arduino.h"
-
+void hookfunc(lua_State *L, lua_Debug *ar);
 #define LED_PIN 13
 void ble_task(void *pvParameter) {
     
@@ -114,7 +115,7 @@ void app_main(void){
 initializeBLEController("HyperLab");
 
     luat_main();
-   
+    lua_sethook(L, &hookfunc, LUA_MASKLINE, 1);
     
     xTaskCreatePinnedToCore(
         ble_task,    // Task function
@@ -134,6 +135,7 @@ void luaClose(String closeScript)
     isClosed = true;
     closeScript.replace('\x01', ' ');
     luaStopScript = closeScript;
+    esp_task_wdt_reset();
     // Serial.println("luaStopScript");
     // Serial.println(luaStopScript);
     // luaobj.stop();
@@ -143,6 +145,7 @@ void luaClose(String closeScript)
 void lua_loop(String script)
 {
     char charArray[2000]={0};
+    esp_task_wdt_reset();
     script.toCharArray(charArray, script.length());
 
 // Serial.println("lua_loop-----------------------------------------------------");
@@ -168,6 +171,24 @@ LLOGI("lua_loop-----------------------------------------------------");
     // Serial.println("-----------------------------------------------------");
 }
 
+
+
+void hookfunc(lua_State *L, lua_Debug *ar)
+{
+    // lua_getinfo(L, "l", ar); // Get ar->currentline
+    // printf("Executing line: %d\n", ar->currentline);
+    // lua_yield(L, 0); // Yield, only works when using `lua_resume` and with 0 return values
+
+    if (isClosed)
+    {
+        isClosed = false;
+
+        luaL_dostring(L,luaStopScript.c_str());
+        luaStopScript = "";
+        luaL_error(L, "lua script closed");
+        // lua_close(L);
+    }
+}
 
 /**
  *  NimBLE_Server Demo:
